@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-05 14:31:21
+# @Last Modified time: 2023-08-05 17:30:04
 
 base64() {
     usage() {
@@ -42,8 +42,12 @@ base64() {
                 b2 = d0 & 0xff, 1 ))) 2>/dev/null
             then
                 # Print decoded triplet, optionally omitting #pad bytes.
-                eval "printf -v a '\\\\x%02x' \$b{0..$(( 3-pad-1 ))}"
-                printf '%b' "$a"
+                printf -v a '\\x%02x' $b0 $b1 $b2
+                if (( pad )); then
+                    echo -ne "${a:0:$(( pad ? (3-pad) << 2 : 12 ))}"
+                else
+                    echo -ne "$a"
+                fi
             elif (( len != 0 )); then
                 printf "error: %q: invalid input\n" "$a" >&2
                 return 1
