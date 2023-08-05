@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-05 13:02:40
+# @Last Modified time: 2023-08-05 14:31:21
 
 base64() {
     usage() {
@@ -14,6 +14,8 @@ base64() {
         # Read base64 string from stdin and write decoded data to stdout.
         local IFS=$'\n' LC_CTYPE=C LC_COLLATE=C a a0
         local -i len pad d0 b{0..2} k{0..3}
+        # Read four characters from stdin and set to `a`. The `read` command
+        # may return less or zero characters if it hit an delimiter (`\n`).
         while read -ern4 a; do
             # Map alphabet from base64 to 64#<d> (builtin bash arithmetic notation).
             #        0   26  52  62 63
@@ -39,6 +41,7 @@ base64() {
                 b1 = d0 >> 8 & 0xff,
                 b2 = d0 & 0xff, 1 ))) 2>/dev/null
             then
+                # Print decoded triplet, optionally omitting #pad bytes.
                 eval "printf -v a '\\\\x%02x' \$b{0..$(( 3-pad-1 ))}"
                 printf '%b' "$a"
             elif (( len != 0 )); then
