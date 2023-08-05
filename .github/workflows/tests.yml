@@ -3,7 +3,7 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - ustar.bash
+      - base64.bash
       - test/**
   workflow_dispatch:
 jobs:
