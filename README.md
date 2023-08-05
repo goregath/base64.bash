@@ -1,3 +1,6 @@
+[![CI](https://github.com/goregath/base64.bash/actions/workflows/tests.yml/badge.svg)](https://github.com/goregath/base64.bash/actions/workflows/tests.yml)
+
+
 # base64.bash
 
 A *"fast"* base64 decoder written entirely in pure bash.
