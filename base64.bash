@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-06 23:00:44
+# @Last Modified time: 2023-08-06 23:51:57
 
 base64() {
     usage() {
@@ -13,7 +13,8 @@ base64() {
     decode() {
         # Read base64 string from stdin and write decoded data to stdout.
         local IFS=$'\n' LC_CTYPE=C LC_COLLATE=C a a0
-        local -i len pad d0 b{0..2} k{0..3}
+        local -i n=512 len pad i d0 k{0..3}
+        local -ia b=()
         # Read four characters from stdin and set to `a`. The `read` command
         # may return less or zero characters if it hit an delimiter (`\n`).
         while read -ern4 a; do
@@ -37,22 +38,23 @@ base64() {
                 k2 += k2>9 ? k2>35 ? k2>61 ? 0 : -36 : 16 : 52,
                 k3 += k3>9 ? k3>35 ? k3>61 ? 0 : -36 : 16 : 52,
                 d0 = k0 | k1 << 6 | k2 << 12 | k3 << 18,
-                b0 = d0 >> 16 & 0xff,
-                b1 = d0 >> 8 & 0xff,
-                b2 = d0 & 0xff, 1 ))) 2>/dev/null
+                b[i++] = d0 >> 16 & 0xff,
+                pad < 2 && (b[i++] = d0 >> 8 & 0xff),
+                pad < 1 && (b[i++] = d0 & 0xff),
+                1 ))) 2>/dev/null
             then
-                # Print decoded triplet, optionally omitting #pad bytes.
-                printf -v a '\\x%02x' $b0 $b1 $b2
-                if (( pad )); then
-                    echo -ne "${a:0:$(( 12 - pad * 4 ))}"
-                else
+                if (( i > n )); then
+                    printf -v a '\\x%02x' "${b[@]:0:$i}"
                     echo -ne "$a"
+                    i=0
                 fi
             elif (( len != 0 )); then
                 printf "error: %q: invalid input\n" "$a" >&2
                 return 1
             fi
         done
+        printf -v a '\\x%02x' "${b[@]:0:$i}"
+        echo -ne "$a"
     }
     local OPTARG OPTIND OPTERR=1 opt
     local -i dflag=0
