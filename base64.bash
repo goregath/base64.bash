@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-05 17:30:04
+# @Last Modified time: 2023-08-06 23:00:44
 
 base64() {
     usage() {
@@ -27,7 +27,7 @@ base64() {
             printf -v a0 '%s%n' "${a0//'='}" len
             if (( len && (
                 pad = 4-len,
-                d0 = 64#"$a0" << 6*pad,
+                d0 = 64#"$a0" << 6 * pad,
                 k0 = d0 & 0x3f,
                 k1 = d0 >> 6 & 0x3f,
                 k2 = d0 >> 12 & 0x3f,
@@ -44,7 +44,7 @@ base64() {
                 # Print decoded triplet, optionally omitting #pad bytes.
                 printf -v a '\\x%02x' $b0 $b1 $b2
                 if (( pad )); then
-                    echo -ne "${a:0:$(( pad ? (3-pad) << 2 : 12 ))}"
+                    echo -ne "${a:0:$(( 12 - pad * 4 ))}"
                 else
                     echo -ne "$a"
                 fi
