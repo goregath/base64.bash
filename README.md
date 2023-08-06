@@ -30,6 +30,23 @@ base64 -d <<<"aGVsbG8gd29ybGQhCg=="
 hello world!
 ```
 
+## Why it is "fast"
+
+This implementation makes use of the [`base#n`](http://www.kernel.org/doc/man-pages/online/pages/man1/bash.1.html#ARITHMETIC_EVALUATION "bash(1) Arithmetic Evaluation") notation, an arithmetic feature common to bash, zsh or ash (busybox).
+
+The base can be set as high as 64, using a consistent order of symbols up to base 62 starting with the digits `0-9`, followed by lower case letters `a-z`, then upper case letters `A-Z`. A base of 64 adds two more characters, `@` (at-sign) and `_` (underscore) representing values of 62 and 63, respectively. Both encodings share the same symbols for the values from 0 to 61, there are only two symbols left (`+`,`/`) that need to be translated (`@`,`_`). 
+
+|         | base64 | 64#n  |         |
+|--------:|:------:|:-----:|:--------|
+| `0-25`  | `A–Z`  | `0-9` | `0-9`   |
+| `26-51` | `a–z`  | `a-z` | `10-35` |
+| `52-61` | `0–9`  | `A-Z` | `36-61` |
+| `62`    | `+`    | `@`   | `62`    |
+| `62`    | `/`    | `_`   | `63`    |
+
+There is a dual use to this approach: Input data can be, with subtle modification, *directly converted to numbers* - and it can be fed in using the right *word size* of four symbols. Base64 encodes three bytes (*3×8 bit*) of data into four symbols (*4×6 bit*) and vice versa. The parser can be designed to read four characters in a row, remap `+` and `/` and convert it to a *24 bit* integer.
+
+
 ## Requirements
 
 Only _GNU Bash 4.3+_ is required.
