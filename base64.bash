@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-07 22:11:48
+# @Last Modified time: 2023-08-08 00:51:15
 
 base64() {
     usage() {
@@ -23,11 +23,10 @@ base64() {
             # FROM:  A–Z a–z 0–9 +  /
             #   TO:  0–9 a–z A–Z @  _
             #        0   10  36  62 63
-            a0="${a//'/'/'_'}"
-            a0="${a0//'+'/'@'}"
-            printf -v a0 '%s%n' "${a0//'='}" len
-            if (( len && (
-                pad = 4-len,
+            if [[ "$a" == ???? && "$a" == [[:alnum:]/+]+([[:alnum:]/+])*(=) ]]; then
+                printf -v a0 '%s%n' "${a//'='}" len
+                a0="${a0//'/'/'_'}" a0="${a0//'+'/'@'}"
+                (( pad = 4-len,
                 d0 = 64#"$a0" << 6 * pad,
                 k0 = d0 & 0x3f,
                 k1 = d0 >> 6 & 0x3f,
@@ -41,14 +40,13 @@ base64() {
                 b[i++] = d0 >> 16 & 0xff,
                 pad < 2 && (b[i++] = d0 >> 8 & 0xff),
                 pad < 1 && (b[i++] = d0 & 0xff),
-                1 ))) 2>/dev/null
-            then
+                1 )) 2>/dev/null
                 if (( i > n )); then
                     printf -v a '\\x%02x' "${b[@]:0:$i}"
                     echo -ne "$a"
                     i=0
                 fi
-            elif (( len != 0 )); then
+            elif [[ "$a" != "" ]]; then
                 printf "error: %q: invalid input\n" "$a" >&2
                 return 1
             fi
