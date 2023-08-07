@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-06 23:51:57
+# @Last Modified time: 2023-08-07 22:11:48
 
 base64() {
     usage() {
@@ -78,3 +78,8 @@ base64() {
         return 1
     fi
 }
+
+if ! return 2>/dev/null; then
+    # only executed if not sourced
+    base64 "$@"
+fi
