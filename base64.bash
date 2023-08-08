@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-08 17:37:54
+# @Last Modified time: 2023-08-08 18:11:59
 
 base64() {
     usage() {
@@ -12,7 +12,7 @@ base64() {
     }
     decode() {
         # Read base64 string from stdin and write decoded data to stdout.
-        local IFS=$'\n' LC_CTYPE=C LC_COLLATE=C a{0..2} s{0..3}
+        local IFS=$'\n' LC_CTYPE=C LC_COLLATE=C a{0..2} s{0..2}
         local -i i j n=76 sn an d0 k{0..3}
         local -ia b=()
         # Fill the buffer `a0` with up to 76 characters, a common line length
@@ -24,16 +24,14 @@ base64() {
             (( sn=${#s0}, sn == 0 )) && continue
             # case toggle input, e.g. swap values of a/A
             # this saves us some ternary branches later on
-            s1="${s0~~[[:alpha:]]}"
-            s2="${s1//'/'/'_'}"
-            s3="${s2//'+'/'@'}"
+            s1="${s0//'/'/'_'}"
+            s2="${s1//'+'/'@'}"
             for (( i=0,j=0; i<sn; i+=4 )); do
-                a0="${s3:$i:4}"
+                a0="${s2:$i:4}"
                 # Map alphabet from base64 to 64#<d> (builtin bash arithmetic notation).
                 #         0   26  52  62 63
                 #  FROM   A–Z a–z 0–9 +  /
                 #    TO   0–9 a–z A–Z @  _
-                #    TO'  0–9 A–Z a–z @  _
                 #         0   10  36  62 63
                 if [[ "$a0" == ???? && "$a0" == [[:alnum:]_@]+([[:alnum:]_@])*(=) ]]; then
                     printf -v a1 '%s%n' "${a0//'='}" an
@@ -42,10 +40,10 @@ base64() {
                     k1 = d0 >> 6 & 0x3f,
                     k2 = d0 >> 12 & 0x3f,
                     k3 = d0 >> 18,
-                    k0 += k0<62 ? k0<10 ? 52 : -10 : 0,
-                    k1 += k1<62 ? k1<10 ? 52 : -10 : 0,
-                    k2 += k2<62 ? k2<10 ? 52 : -10 : 0,
-                    k3 += k3<62 ? k3<10 ? 52 : -10 : 0,
+                    k0 += k0>9 ? k0>35 ? k0>61 ? 0 : -36 : 16 : 52,
+                    k1 += k1>9 ? k1>35 ? k1>61 ? 0 : -36 : 16 : 52,
+                    k2 += k2>9 ? k2>35 ? k2>61 ? 0 : -36 : 16 : 52,
+                    k3 += k3>9 ? k3>35 ? k3>61 ? 0 : -36 : 16 : 52,
                     d0 = k0 | k1 << 6 | k2 << 12 | k3 << 18,
                     b[j++] = d0 >> 16,
                     an > 2  && (b[j++] = d0 >> 8 & 0xff),
@@ -82,12 +80,6 @@ base64() {
         return 1
     fi
 }
-
-# Check if case toggling is supported, this is an undocumented feature.
-if : aA && [[ "${_~~}" != "Aa" ]]; then
-    printf "error: missing feature: case toggle\n" >&2
-    return 1 2>/dev/null || exit 1
-fi
 
 if ! return 2>/dev/null; then
     # only executed if not sourced
