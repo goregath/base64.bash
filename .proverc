@@ -11,3 +11,5 @@
 # TEST FILES
 
 test/rawdata.bats
+test/padding.bats
+test/invalid.bats
