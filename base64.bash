@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-08 18:48:05
+# @Last Modified time: 2023-08-15 18:47:40
 
 base64() {
     usage() {
@@ -22,8 +22,8 @@ base64() {
         while read -ern$n s0; do
             # s0 can be empty if a delmiter has been hit
             (( sn=${#s0}, sn == 0 )) && continue
-            s1="${s0//'/'/'_'}"
-            s2="${s1//'+'/'@'}"
+            s1="${s0//\//_}"
+            s2="${s1//+/@}"
             for (( i=0,j=0; i<sn; i+=4 )); do
                 a0="${s2:$i:4}"
                 # Map alphabet from base64 to 64#<d> (builtin bash arithmetic notation).

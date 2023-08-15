@@ -7,7 +7,7 @@ One of the *fastest*&#x2A; pure bash base64 decoder out there.
 
 This implementation is fully self-contained and does not rely on any external programs.
 
-Tested with _GNU Bash 5.1_, _4.4_ and _4.3_, striving for full support from _4.3+_.
+Tested with _GNU Bash 5.1_ down to _4.1_, striving for full support from _4.1+_.
 
 <sub>&#x2A; *Compared to alternative implementations*</sub>
 
@@ -65,7 +65,7 @@ There is a dual use to this approach: Input data can, with subtle modification, 
 
 ## Requirements
 
-Only _GNU Bash 4.3+_ is required with array support enabled at compile time.
+Only _GNU Bash 4.1+_ is required with array support enabled at compile time.
 
 [bash(1)]: http://www.kernel.org/doc/man-pages/online/pages/man1/bash.1.html#ARITHMETIC_EVALUATION "bash(1) Arithmetic Evaluation"
 [base64(1)]: http://www.kernel.org/doc/man-pages/online/pages/man1/base64.1.html "Manpage of base64(1)"
