@@ -45,3 +45,11 @@ setup() {
 	assert_failure
 	assert_output -e '^error:'
 }
+
+@test "multiple paddings" {
+	run base64 -d <<-DAT
+		YWJjZA==
+		YWJjZA==
+	DAT
+	assert_output 'abcdabcd'
+}
