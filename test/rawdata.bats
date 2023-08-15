@@ -30,3 +30,8 @@ libdecode() {
 	run libdecode < <(binencode)
 	assert_output -p '40aff2e9d2d8922e47afd4648e6967497158785fbd1da870e7110266bf944880'
 }
+
+@test "decode 100k of binary data" {
+	run libdecode < "$BATS_TEST_DIRNAME"/data/raw100k.txt
+	assert_output -p 'b36d2ca1f323a1e61e4ba2d11d7407a933430019ca5ceb176dbc2436f9c163be'
+}
