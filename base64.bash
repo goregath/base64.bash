@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-15 18:47:40
+# @Last Modified time: 2023-08-16 18:49:06
 
 base64() {
     usage() {
@@ -21,10 +21,10 @@ base64() {
         # multiple of 4 - a limitation of this algorithm.
         while read -ern$n s0; do
             # s0 can be empty if a delmiter has been hit
-            (( sn=${#s0}, sn == 0 )) && continue
+            (( i=0, j=0, sn=${#s0} )) || continue
             s1="${s0//\//_}"
             s2="${s1//+/@}"
-            for (( i=0,j=0; i<sn; i+=4 )); do
+            for (( ; i<sn; i+=4 )); do
                 a0="${s2:$i:4}"
                 # Map alphabet from base64 to 64#<d> (builtin bash arithmetic notation).
                 #         0   26  52  62 63
