@@ -4,7 +4,7 @@
 # @Author: goregath
 # @Date:   2023-08-04 20:19:34
 # @Last Modified by:   goregath
-# @Last Modified time: 2023-08-16 20:03:43
+# @Last Modified time: 2023-08-17 00:36:50
 
 # Map alphabet from base64 to 64#<d> (builtin bash arithmetic notation).
 #         0   26  52  62 63
@@ -43,15 +43,14 @@ base64() {
         # when storing base64 encoded strings. The real buffer size may be
         # less if `read` hits a delimiter (`\n`) but should always be a
         # multiple of 4 - a limitation of this algorithm.
-        while read -er s0 && (( j=0, sn=${#s0} )) && [[ "$s0" == [[:alnum:]/+]+([[:alnum:]/+])*(=) ]]; do
+        while read -er s0 && (( j=0, sn=${#s0} )) && [[ "$s0" == *([[:alnum:]/+=]) ]]; do
             # s0 can be empty if a delmiter has been hit
             s1="${s0//\//_}"
             s2="${s1//+/@}"
             eval eval set -- '\${s2:'"{0..$sn..4}"':4}'
             # shellcheck disable=SC2048
             for a0 in $*; do
-                printf -v a1 '%s%n' "${a0//'='}" an
-                (( d0 = 64#$a1 << 6 * (4-an),
+                i='d0=64#'"$a0"',
                 k0 = d0 & 0x3f,
                 k1 = d0 >> 6 & 0x3f,
                 k2 = d0 >> 12 & 0x3f,
@@ -62,9 +61,8 @@ base64() {
                 k3 += k3>9 ? k3>35 ? k3>61 ? 0 : -36 : 16 : 52,
                 d0 = k0 | k1 << 6 | k2 << 12 | k3 << 18,
                 b[j++] = d0 >> 16,
-                an > 2  && (b[j++] = d0 >> 8 & 0xff),
-                an == 4 && (b[j++] = d0 & 0xff),
-                1 ))
+                b[j++] = d0 >> 8 & 0xff,
+                b[j++] = d0 & 0xff' || break
             done
             printf -v a2 '\\x%x' "${b[@]:0:$j}"
             echo -ne "$a2"
